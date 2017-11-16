@@ -1,0 +1,684 @@
+[gd_scene load_steps=20 format=1]
+
+[ext_resource path="res://sprites/pixelbranco.png" type="Texture" id=1]
+[ext_resource path="res://fonts/score.fnt" type="BitmapFont" id=2]
+[ext_resource path="res://sprites/UI/buttonRed.png" type="Texture" id=3]
+[ext_resource path="res://scenes/meteoro_spawn.tscn" type="PackedScene" id=4]
+[ext_resource path="res://scenes/inimigo_spawn.tscn" type="PackedScene" id=5]
+[ext_resource path="res://scenes/nave.tscn" type="PackedScene" id=6]
+[ext_resource path="res://sprites/Effects/star1.png" type="Texture" id=7]
+[ext_resource path="res://sprites/UI/playerLife1_red.png" type="Texture" id=8]
+[ext_resource path="res://sprites/UI/shadedLight06.png" type="Texture" id=9]
+[ext_resource path="res://sprites/UI/shadedLight05.png" type="Texture" id=10]
+[ext_resource path="res://sprites/UI/shadedLight48.png" type="Texture" id=11]
+[ext_resource path="res://sprites/UI/shadedLight14.png" type="Texture" id=12]
+
+[sub_resource type="GDScript" id=1]
+
+resource/name = "pausar"
+script/source = "extends CanvasLayer
+
+func _ready():
+	set_process_input(true)
+	
+func _input(event):
+	if game.gameOver == false && (event.is_action_pressed(\"pause\") && !event.is_echo() ): #echo = pressionado
+		get_tree().set_pause(!get_tree().is_paused()) #bool invertida
+		
+		if get_tree().is_paused():
+			get_node(\"pausado\").show()
+			get_node(\"preto_branco\").show()
+			get_node(\"btn_sair\").show()
+		else:
+			get_node(\"pausado\").hide()
+			get_node(\"preto_branco\").hide()
+			get_node(\"btn_sair\").hide()
+		
+	pass
+
+func _on_btn_sair_pressed():
+	get_tree().change_scene(\"res://scenes/welcome.tscn\")
+"
+
+[sub_resource type="CanvasItemShader" id=2]
+
+_code = {
+"fragment": "vec4 pixel_tela = vec4(texscreen(SCREEN_UV), 1);
+float media = (pixel_tela.r + pixel_tela.g + pixel_tela.b) / 3;
+COLOR = vec4(media,media,media,1);",
+"fragment_ofs": 0,
+"light": "",
+"light_ofs": 0,
+"vertex": "",
+"vertex_ofs": 0
+}
+
+[sub_resource type="CanvasItemMaterial" id=3]
+
+shader/shader = SubResource( 2 )
+shader/shading_mode = 0
+
+[sub_resource type="GDScript" id=4]
+
+resource/name = "gameover"
+script/source = "extends CanvasLayer
+
+func _ready():
+	#set_process(true)
+	pass
+	
+func _process(delta):
+	pass
+	
+func gameOver():
+	print(\"GameOver\")
+	if game.gameOver == true:
+		get_tree().set_pause(!get_tree().is_paused()) #bool invertida
+	
+	if get_tree().is_paused():
+		get_node(\"pausado1\").show()
+		get_node(\"preto_branco1\").show()
+		get_node(\"btn_sair1\").show()
+	else:
+		get_node(\"pausado1\").hide()
+		get_node(\"preto_branco1\").hide()
+		get_node(\"btn_sair1\").hide()
+
+func _on_btn_sair1_pressed():
+	get_tree().change_scene(\"res://scenes/welcome.tscn\")
+"
+
+[sub_resource type="GDScript" id=5]
+
+script/source = "extends Camera2D
+
+var vel = 120
+var shake = 0 #tempo que vai tremer
+
+func _ready():
+	set_process(true)
+
+func _process(delta):
+	set_offset(get_offset() + Vector2(0, -1) * vel * delta)
+	
+	if shake > 0:
+		set_pos(Vector2(cos(rad2deg(shake)), sin(rad2deg(shake))) * 3 )
+		shake -= delta
+	else:
+		set_pos(Vector2(0,0))
+	
+func shake():
+	shake = 0.3"
+
+[sub_resource type="GDScript" id=6]
+
+script/source = "extends Label
+
+func _ready():
+	game.connect(\"score_changed\", self, \"_on_score_changed\")
+	pass
+
+func _on_score_changed():
+	set_text(str(game.score))
+	pass"
+
+[sub_resource type="GDScript" id=7]
+
+script/source = "extends Node2D
+
+export(Texture) var textura
+
+func _ready():
+	game.connect(\"vidas_changed\", self, \"_on_vidas_changed\")
+
+func _on_vidas_changed():
+	update()
+
+func _draw():
+	for n in range(0, game.vidas):
+		draw_texture(textura, Vector2(n * (textura.get_width() + 3), 0))
+		"
+
+[node name="main" type="CanvasLayer"]
+
+layer = 1
+offset = Vector2( 0, 0 )
+rotation = 0.0
+scale = Vector2( 1, 1 )
+
+[node name="pausar" type="CanvasLayer" parent="."]
+
+process/pause_mode = 2
+editor/display_folded = true
+layer = 11
+offset = Vector2( 0, 0 )
+rotation = 0.0
+scale = Vector2( 1, 1 )
+script/script = SubResource( 1 )
+
+[node name="preto_branco" type="TextureFrame" parent="pausar"]
+
+visibility/visible = false
+material/material = SubResource( 3 )
+focus/ignore_mouse = true
+focus/stop_mouse = true
+size_flags/horizontal = 2
+size_flags/vertical = 2
+margin/left = 0.0
+margin/top = 0.0
+margin/right = 360.0
+margin/bottom = 640.0
+texture = ExtResource( 1 )
+expand = true
+stretch_mode = 0
+
+[node name="pausado" type="Label" parent="pausar"]
+
+visibility/visible = false
+focus/ignore_mouse = true
+focus/stop_mouse = true
+size_flags/horizontal = 2
+size_flags/vertical = 0
+margin/left = 56.0
+margin/top = 231.0
+margin/right = 315.0
+margin/bottom = 271.0
+custom_fonts/font = ExtResource( 2 )
+custom_colors/font_color = Color( 0.832031, 0.821164, 0.136505, 1 )
+text = "Pausado"
+align = 1
+valign = 1
+uppercase = true
+percent_visible = 1.0
+lines_skipped = 0
+max_lines_visible = -1
+
+[node name="btn_sair" type="TextureButton" parent="pausar"]
+
+editor/display_folded = true
+visibility/visible = false
+focus/ignore_mouse = false
+focus/stop_mouse = true
+size_flags/horizontal = 2
+size_flags/vertical = 2
+margin/left = 74.0
+margin/top = 283.0
+margin/right = 296.0
+margin/bottom = 322.0
+toggle_mode = false
+enabled_focus_mode = 2
+shortcut = null
+textures/normal = ExtResource( 3 )
+params/resize_mode = 0
+params/stretch_mode = 0
+
+[node name="exit" type="Label" parent="pausar/btn_sair"]
+
+focus/ignore_mouse = true
+focus/stop_mouse = true
+size_flags/horizontal = 2
+size_flags/vertical = 0
+margin/left = -32.0
+margin/top = 1.0
+margin/right = 253.0
+margin/bottom = 40.0
+custom_colors/font_color = Color( 0.227451, 0.180392, 0.247059, 1 )
+custom_constants/shadow_offset_x = 0
+text = "Sair para menu"
+align = 1
+valign = 1
+uppercase = true
+percent_visible = 1.0
+lines_skipped = 0
+max_lines_visible = -1
+
+[node name="gameover" type="CanvasLayer" parent="."]
+
+process/pause_mode = 2
+editor/display_folded = true
+layer = 1
+offset = Vector2( 0, 0 )
+rotation = 0.0
+scale = Vector2( 1, 1 )
+script/script = SubResource( 4 )
+
+[node name="preto_branco1" type="TextureFrame" parent="gameover"]
+
+visibility/visible = false
+material/material = SubResource( 3 )
+focus/ignore_mouse = true
+focus/stop_mouse = true
+size_flags/horizontal = 2
+size_flags/vertical = 2
+margin/left = 0.0
+margin/top = 0.0
+margin/right = 360.0
+margin/bottom = 640.0
+texture = ExtResource( 1 )
+expand = true
+stretch_mode = 0
+
+[node name="pausado1" type="Label" parent="gameover"]
+
+visibility/visible = false
+focus/ignore_mouse = true
+focus/stop_mouse = true
+size_flags/horizontal = 2
+size_flags/vertical = 0
+margin/left = 27.0
+margin/top = 236.0
+margin/right = 341.0
+margin/bottom = 276.0
+custom_fonts/font = ExtResource( 2 )
+custom_colors/font_color = Color( 0.832031, 0.821164, 0.136505, 1 )
+text = "Game Over"
+align = 1
+valign = 1
+uppercase = true
+percent_visible = 1.0
+lines_skipped = 0
+max_lines_visible = -1
+
+[node name="btn_sair1" type="TextureButton" parent="gameover"]
+
+editor/display_folded = true
+visibility/visible = false
+focus/ignore_mouse = false
+focus/stop_mouse = true
+size_flags/horizontal = 2
+size_flags/vertical = 2
+margin/left = 74.0
+margin/top = 283.0
+margin/right = 296.0
+margin/bottom = 322.0
+toggle_mode = false
+enabled_focus_mode = 2
+shortcut = null
+textures/normal = ExtResource( 3 )
+params/resize_mode = 0
+params/stretch_mode = 0
+
+[node name="exit" type="Label" parent="gameover/btn_sair1"]
+
+focus/ignore_mouse = true
+focus/stop_mouse = true
+size_flags/horizontal = 2
+size_flags/vertical = 0
+margin/left = -32.0
+margin/top = 1.0
+margin/right = 253.0
+margin/bottom = 40.0
+custom_colors/font_color = Color( 0.227451, 0.180392, 0.247059, 1 )
+custom_constants/shadow_offset_x = 0
+text = "Ir para menu"
+align = 1
+valign = 1
+uppercase = true
+percent_visible = 1.0
+lines_skipped = 0
+max_lines_visible = -1
+
+[node name="meteoro_spawn" parent="." instance=ExtResource( 4 )]
+
+[node name="inimigo_spawn" parent="." instance=ExtResource( 5 )]
+
+[node name="camera" type="Camera2D" parent="."]
+
+editor/display_folded = true
+anchor_mode = 0
+rotating = false
+current = true
+zoom = Vector2( 1, 1 )
+limit/left = -10000000
+limit/top = -10000000
+limit/right = 10000000
+limit/bottom = 10000000
+drag_margin/h_enabled = true
+drag_margin/v_enabled = true
+smoothing/enable = false
+smoothing/speed = 5.0
+drag_margin/left = 0.2
+drag_margin/top = 0.2
+drag_margin/right = 0.2
+drag_margin/bottom = 0.2
+script/script = SubResource( 5 )
+
+[node name="nave" parent="camera" instance=ExtResource( 6 )]
+
+transform/pos = Vector2( 186.48, 550.764 )
+transform/scale = Vector2( 0.6, 0.6 )
+
+[node name="parallaxBackground" type="ParallaxBackground" parent="."]
+
+editor/display_folded = true
+layer = -1
+offset = Vector2( 0, 0 )
+rotation = 0.0
+scale = Vector2( 1, 1 )
+scroll/offset = Vector2( 0, 0 )
+scroll/base_offset = Vector2( 0, 0 )
+scroll/base_scale = Vector2( 1, 1 )
+scroll/limit_begin = Vector2( 0, 0 )
+scroll/limit_end = Vector2( 0, 0 )
+scroll/ignore_camera_zoom = false
+
+[node name="estrelas" type="ParallaxLayer" parent="parallaxBackground"]
+
+editor/display_folded = true
+visibility/opacity = 0.6
+z/z = 1
+motion/scale = Vector2( 1, 0.6 )
+motion/offset = Vector2( 0, 0 )
+motion/mirroring = Vector2( 0, 640 )
+
+[node name="estrela" type="Sprite" parent="parallaxBackground/estrelas"]
+
+transform/pos = Vector2( 179.284, 24.5643 )
+texture = ExtResource( 7 )
+
+[node name="estrela3 3" type="Sprite" parent="parallaxBackground/estrelas"]
+
+transform/pos = Vector2( 300.442, 96.068 )
+texture = ExtResource( 7 )
+
+[node name="estrela35 2" type="Sprite" parent="parallaxBackground/estrelas"]
+
+transform/pos = Vector2( 128.936, 281.532 )
+texture = ExtResource( 7 )
+
+[node name="estrela353" type="Sprite" parent="parallaxBackground/estrelas"]
+
+transform/pos = Vector2( 259.321, 461.947 )
+texture = ExtResource( 7 )
+
+[node name="estrela2" type="Sprite" parent="parallaxBackground/estrelas"]
+
+transform/pos = Vector2( 141.794, 155.569 )
+transform/rot = -1.21143
+texture = ExtResource( 7 )
+
+[node name="estrela3" type="Sprite" parent="parallaxBackground/estrelas"]
+
+transform/pos = Vector2( 42.3201, 410.924 )
+transform/rot = -1.21143
+texture = ExtResource( 7 )
+
+[node name="estrela4" type="Sprite" parent="parallaxBackground/estrelas"]
+
+transform/pos = Vector2( 301.527, 551.518 )
+transform/rot = -1.21143
+texture = ExtResource( 7 )
+
+[node name="estrela5" type="Sprite" parent="parallaxBackground/estrelas"]
+
+transform/pos = Vector2( 139.459, 468.454 )
+transform/rot = -1.21143
+texture = ExtResource( 7 )
+
+[node name="estrela6" type="Sprite" parent="parallaxBackground/estrelas"]
+
+transform/pos = Vector2( 304.178, 336.742 )
+transform/rot = -1.21143
+texture = ExtResource( 7 )
+
+[node name="estrela1" type="Sprite" parent="parallaxBackground/estrelas"]
+
+transform/pos = Vector2( 52.2999, 67.1213 )
+texture = ExtResource( 7 )
+
+[node name="estrela35" type="Sprite" parent="parallaxBackground/estrelas"]
+
+transform/pos = Vector2( 51.6024, 247.093 )
+texture = ExtResource( 7 )
+
+[node name="estrela36" type="Sprite" parent="parallaxBackground/estrelas"]
+
+transform/pos = Vector2( 256.436, 238.181 )
+texture = ExtResource( 7 )
+
+[node name="estrelinhas" type="ParallaxLayer" parent="parallaxBackground"]
+
+editor/display_folded = true
+motion/scale = Vector2( 1, 0.2 )
+motion/offset = Vector2( 0, 0 )
+motion/mirroring = Vector2( 0, 640 )
+
+[node name="estrelinha" type="Sprite" parent="parallaxBackground/estrelinhas"]
+
+transform/pos = Vector2( 43.32, 27.9775 )
+transform/scale = Vector2( 0.5, 0.5 )
+texture = ExtResource( 7 )
+
+[node name="estrelinha10" type="Sprite" parent="parallaxBackground/estrelinhas"]
+
+transform/pos = Vector2( 308.209, 443.378 )
+transform/scale = Vector2( 0.5, 0.5 )
+texture = ExtResource( 7 )
+
+[node name="estrelinha3" type="Sprite" parent="parallaxBackground/estrelinhas"]
+
+transform/pos = Vector2( 134.488, 36.7096 )
+transform/scale = Vector2( 0.5, 0.5 )
+texture = ExtResource( 7 )
+
+[node name="estrelinha4" type="Sprite" parent="parallaxBackground/estrelinhas"]
+
+transform/pos = Vector2( 233.843, 25.8631 )
+transform/scale = Vector2( 0.5, 0.5 )
+texture = ExtResource( 7 )
+
+[node name="estrelinha5" type="Sprite" parent="parallaxBackground/estrelinhas"]
+
+transform/pos = Vector2( 104.678, 138.028 )
+transform/scale = Vector2( 0.5, 0.5 )
+texture = ExtResource( 7 )
+
+[node name="estrelinha6" type="Sprite" parent="parallaxBackground/estrelinhas"]
+
+transform/pos = Vector2( 316.68, 209.443 )
+transform/scale = Vector2( 0.5, 0.5 )
+texture = ExtResource( 7 )
+
+[node name="estrelinha7" type="Sprite" parent="parallaxBackground/estrelinhas"]
+
+transform/pos = Vector2( 210.694, 562.371 )
+transform/scale = Vector2( 0.5, 0.5 )
+texture = ExtResource( 7 )
+
+[node name="estrelinha9" type="Sprite" parent="parallaxBackground/estrelinhas"]
+
+transform/pos = Vector2( 230.173, 382.273 )
+transform/scale = Vector2( 0.5, 0.5 )
+texture = ExtResource( 7 )
+
+[node name="estrelinha8" type="Sprite" parent="parallaxBackground/estrelinhas"]
+
+transform/pos = Vector2( 54.8775, 353.66 )
+transform/scale = Vector2( 0.5, 0.5 )
+texture = ExtResource( 7 )
+
+[node name="estrelinha1" type="Sprite" parent="parallaxBackground/estrelinhas"]
+
+transform/pos = Vector2( 233.792, 290.619 )
+transform/scale = Vector2( 0.5, 0.5 )
+texture = ExtResource( 7 )
+
+[node name="estrelinha3 2" type="Sprite" parent="parallaxBackground/estrelinhas"]
+
+transform/pos = Vector2( 193.562, 470.354 )
+transform/scale = Vector2( 0.5, 0.5 )
+texture = ExtResource( 7 )
+
+[node name="estrelinha33" type="Sprite" parent="parallaxBackground/estrelinhas"]
+
+transform/pos = Vector2( 48.9625, 179.906 )
+transform/scale = Vector2( 0.5, 0.5 )
+texture = ExtResource( 7 )
+
+[node name="estrelinha35" type="Sprite" parent="parallaxBackground/estrelinhas"]
+
+transform/pos = Vector2( 165.125, 233.177 )
+transform/scale = Vector2( 0.5, 0.5 )
+texture = ExtResource( 7 )
+
+[node name="estrelinha36" type="Sprite" parent="parallaxBackground/estrelinhas"]
+
+transform/pos = Vector2( 342.719, 327.086 )
+transform/scale = Vector2( 0.5, 0.5 )
+texture = ExtResource( 7 )
+
+[node name="estrelinha37" type="Sprite" parent="parallaxBackground/estrelinhas"]
+
+transform/pos = Vector2( 54.5339, 532.773 )
+transform/scale = Vector2( 0.5, 0.5 )
+texture = ExtResource( 7 )
+
+[node name="estrelinha38" type="Sprite" parent="parallaxBackground/estrelinhas"]
+
+transform/pos = Vector2( 104.044, 383.025 )
+transform/scale = Vector2( 0.5, 0.5 )
+texture = ExtResource( 7 )
+
+[node name="estrelinha2" type="Sprite" parent="parallaxBackground/estrelinhas"]
+
+transform/pos = Vector2( 42.8483, 102.34 )
+transform/scale = Vector2( 0.5, 0.5 )
+texture = ExtResource( 7 )
+
+[node name="estrelinha3 3" type="Sprite" parent="parallaxBackground/estrelinhas"]
+
+transform/pos = Vector2( 199.78, 129.834 )
+transform/scale = Vector2( 0.5, 0.5 )
+texture = ExtResource( 7 )
+
+[node name="estrelinha34" type="Sprite" parent="parallaxBackground/estrelinhas"]
+
+transform/pos = Vector2( 291.621, 140.949 )
+transform/scale = Vector2( 0.5, 0.5 )
+texture = ExtResource( 7 )
+
+[node name="estrelinha35 2" type="Sprite" parent="parallaxBackground/estrelinhas"]
+
+transform/pos = Vector2( 150.84, 327.98 )
+transform/scale = Vector2( 0.5, 0.5 )
+texture = ExtResource( 7 )
+
+[node name="estrelinha353" type="Sprite" parent="parallaxBackground/estrelinhas"]
+
+transform/pos = Vector2( 312.431, 536.813 )
+transform/scale = Vector2( 0.5, 0.5 )
+texture = ExtResource( 7 )
+
+[node name="estrelinha354" type="Sprite" parent="parallaxBackground/estrelinhas"]
+
+transform/pos = Vector2( 138.339, 519.203 )
+transform/scale = Vector2( 0.5, 0.5 )
+texture = ExtResource( 7 )
+
+[node name="estrelinha355" type="Sprite" parent="parallaxBackground/estrelinhas"]
+
+transform/pos = Vector2( 63, 440.3 )
+transform/scale = Vector2( 0.5, 0.5 )
+texture = ExtResource( 7 )
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+editor/display_folded = true
+layer = 10
+offset = Vector2( 0, 0 )
+rotation = 0.0
+scale = Vector2( 1, 1 )
+
+[node name="score_label" type="Label" parent="HUD"]
+
+focus/ignore_mouse = true
+focus/stop_mouse = true
+size_flags/horizontal = 2
+size_flags/vertical = 0
+margin/left = 173.0
+margin/top = 11.0
+margin/right = 346.0
+margin/bottom = 43.0
+custom_fonts/font = ExtResource( 2 )
+text = "0"
+align = 2
+valign = 1
+percent_visible = 1.0
+lines_skipped = 0
+max_lines_visible = -1
+script/script = SubResource( 6 )
+
+[node name="vidas" type="Node2D" parent="HUD"]
+
+transform/pos = Vector2( 64.7063, 15.258 )
+transform/scale = Vector2( 0.7, 0.7 )
+script/script = SubResource( 7 )
+textura = ExtResource( 8 )
+
+[node name="m_esquerda" type="TouchScreenButton" parent="HUD"]
+
+visibility/opacity = 0.5
+transform/pos = Vector2( 15, 585 )
+transform/scale = Vector2( 0.7, 0.7 )
+normal = ExtResource( 9 )
+pressed = ExtResource( 9 )
+bitmask = null
+shape = null
+shape_centered = true
+shape_visible = true
+passby_press = false
+action = "esquerda"
+visibility_mode = 1
+
+[node name="m_direita" type="TouchScreenButton" parent="HUD"]
+
+visibility/opacity = 0.5
+transform/pos = Vector2( 100, 585 )
+transform/scale = Vector2( 0.7, 0.7 )
+normal = ExtResource( 10 )
+pressed = ExtResource( 10 )
+bitmask = null
+shape = null
+shape_centered = true
+shape_visible = true
+passby_press = false
+action = "direita"
+visibility_mode = 1
+
+[node name="m_tiro" type="TouchScreenButton" parent="HUD"]
+
+process/pause_mode = 2
+visibility/opacity = 0.5
+transform/pos = Vector2( 282.207, 573.493 )
+transform/scale = Vector2( 0.7, 0.7 )
+normal = ExtResource( 11 )
+pressed = ExtResource( 11 )
+bitmask = null
+shape = null
+shape_centered = true
+shape_visible = true
+passby_press = false
+action = "tiro"
+visibility_mode = 1
+
+[node name="m_pause" type="TouchScreenButton" parent="HUD"]
+
+process/pause_mode = 2
+visibility/opacity = 0.5
+transform/pos = Vector2( 9.04404, 7.5367 )
+transform/scale = Vector2( 0.7, 0.7 )
+normal = ExtResource( 12 )
+pressed = ExtResource( 12 )
+bitmask = null
+shape = null
+shape_centered = true
+shape_visible = true
+passby_press = false
+action = "pause"
+visibility_mode = 1
+
+[connection signal="pressed" from="pausar/btn_sair" to="pausar" method="_on_btn_sair_pressed"]
+
+[connection signal="pressed" from="gameover/btn_sair1" to="gameover" method="_on_btn_sair1_pressed"]
+
+
