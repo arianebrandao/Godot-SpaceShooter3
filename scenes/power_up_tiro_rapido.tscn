@@ -18,7 +18,7 @@ func _ready():
 
 func _on_power_up_tiro_rapido_area_enter( nave ):
 	if nave.is_in_group(game.GRUPO_NAVE):
-		nave.setArma(1, 20)
+		nave.setArma(1, 10)
 		queue_free()
 "
 

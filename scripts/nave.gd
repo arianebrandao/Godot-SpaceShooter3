@@ -2,6 +2,7 @@ extends Area2D
 
 export var velocidade = 260
 var arma #tipos de tiros
+var timer_buff = Timer.new()
 
 #classes
 var tiro_simples = preload("res://scripts/classes/Tiro_simples.gd")
@@ -44,14 +45,18 @@ func _process(delta):
 	
 func setArma(valor, segundos):
 	arma = armas[valor]
-	var timer_buff = Timer.new()
+	#var timer_buff = Timer.new()
 	timer_buff.set_wait_time(segundos)
 	timer_buff.connect("timeout", self, "_on_timer_buff")
 	timer_buff.start()
 	add_child(timer_buff)
 	
+	print(timer_buff)
+	print("Segundos: " + str(timer_buff.get_wait_time()))
+	
 func _on_timer_buff():
 	arma = armas[0]
+	timer_buff.stop()
 
 func _on_nave_area_enter( area ):
 	if area.is_in_group(game.GRUPO_INIMIGO):
