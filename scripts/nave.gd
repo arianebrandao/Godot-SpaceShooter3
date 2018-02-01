@@ -40,12 +40,13 @@ func _process(delta):
 		
 	if get_pos().x < 30:
 		esquerda = 0
-		
+	
+	#posiciona nave
 	set_pos(get_pos() + Vector2(1,0) * velocidade * delta * (direita + esquerda))
 	
 	#disparo
-	if Input.is_action_pressed("tiro"):
-		arma.dispara()
+	#if Input.is_action_pressed("tiro"):
+	arma.dispara()
 		
 	arma.atualiza(delta)
 	
