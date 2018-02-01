@@ -152,6 +152,7 @@ tracks/1/keys = {
 
 [node name="nave" type="Area2D"]
 
+editor/display_folded = true
 transform/pos = Vector2( 335.707, 392.493 )
 input/pickable = true
 shapes/0/shape = SubResource( 1 )

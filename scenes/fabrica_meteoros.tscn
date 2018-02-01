@@ -64,7 +64,6 @@ script/script = ExtResource( 1 )
 
 [node name="meteoro" type="Area2D" parent="."]
 
-editor/display_folded = true
 input/pickable = true
 shapes/0/shape = SubResource( 1 )
 shapes/0/transform = Matrix32( 1, 0, 0, 1, 0, 0 )
@@ -139,6 +138,7 @@ trigger = false
 
 [node name="meteoro1" type="Area2D" parent="."]
 
+editor/display_folded = true
 transform/pos = Vector2( 116.554, -2.43838 )
 input/pickable = true
 shapes/0/shape = SubResource( 3 )

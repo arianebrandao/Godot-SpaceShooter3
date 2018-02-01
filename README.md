@@ -1,9 +1,10 @@
 # About SpaceShooter3 - a mobile space shooter
 
-The 1.4 version is an example game built with [Godot](http://godotengine.org/) to go along with the [Tutorial Godot](https://www.youtube.com/playlist?list=PLQzIfDE4WrykgQb3fMwBR2j-kc0eIW-Qn) videos tutorial by Papai Game Maker.
+The 1.5 version is an example game built with [Godot](http://godotengine.org/) to go along with the [Tutorial Godot](https://www.youtube.com/playlist?list=PLQzIfDE4WrykgQb3fMwBR2j-kc0eIW-Qn) videos tutorial by Papai Game Maker.
 
-## BugFix v1.4
-* Buff duration fixed
+## BugFix
+* Add icon display of buff duration
+* Buff duration fixed (v1.4)
 
 ## Credits
 
