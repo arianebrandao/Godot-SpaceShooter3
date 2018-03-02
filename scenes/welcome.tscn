@@ -15,6 +15,7 @@ script/source = "extends ParallaxBackground
 func _ready():
 	get_tree().set_pause(false) #bool invertida
 	game.setVidas(4)
+	game.setScore(0)
 	game.gameOver = false
 	pass
 

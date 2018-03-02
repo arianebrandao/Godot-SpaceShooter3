@@ -3,6 +3,7 @@
 The 1.6 version is an example game built with [Godot](http://godotengine.org/) to go along with the [Tutorial Godot](https://www.youtube.com/playlist?list=PLQzIfDE4WrykgQb3fMwBR2j-kc0eIW-Qn) videos tutorial by Papai Game Maker.
 
 ## BugFix
+* Score fixed (v1.7)
 * Controllers improvement (v1.6)
 * Add icon display of buff duration (v1.5)
 * Buff duration fixed (v1.4)

@@ -18,7 +18,7 @@ func getCamera():
 	return get_tree().get_root().get_node("main").get_node("camera")
 	
 func setScore(valor):
-	if valor > 0:
+	if valor >= 0:
 		score = valor
 		emit_signal("score_changed")
 	
